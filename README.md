@@ -36,3 +36,4 @@ Finally, the result is sent back to the front-end and displayed to the user in r
 - Datasets :
 https://huggingface.co/datasets/dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset
 - Hosted app link :
+https://hackathonm-2-sms-classifier-taxw.vercel.app/
