@@ -1,13 +1,13 @@
 ISPM - Institut Supérieur Polytechnique de Madagascar (www.ispm-edu.com)
 
 - Name of each member :
-  LAZAHARIVELO Jakina Andriantsoa : Backend Developer
-  RAJOHNSON Fitia : Frontend developer
-  RAMANDIMBISON Ezra Niel : AI Expert
-  RANDRIANAVALONA Mahefa Nirina : DevOps
-  ANDRITIANA FANORENANTSOA Steddi Karen : Data Scientist
-  RANDRIANANDRAINA Jessica : Data Scientist
-  ANDRIANIRINA Tsanta Fitiavana : Frontend Developer
+  LAZAHARIVELO Jakina Andriantsoa : Backend Developer;
+  RAJOHNSON Fitia : Frontend developer;
+  RAMANDIMBISON Ezra Niel : AI Expert;
+  RANDRIANAVALONA Mahefa Nirina : DevOps;
+  ANDRITIANA FANORENANTSOA Steddi Karen : Data Scientist;
+  RANDRIANANDRAINA Jessica : Data Scientist;
+  ANDRIANIRINA Tsanta Fitiavana : Frontend Developer.
   
 - Stack description:
   Next.js : Next.js is an open-source React framework developed by Vercel that simplifies building fast, SEO-friendly, and scalable web applications.
