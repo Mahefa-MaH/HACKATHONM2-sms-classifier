@@ -1,1 +1,1 @@
-export const API_BASE_URL = "http://127.0.0.1:8000/api/nlp"
+export const API_BASE_URL = "https://fastapibackend-production-edc7.up.railway.app/api/nlp"
