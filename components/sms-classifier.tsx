@@ -4,127 +4,30 @@ import { useState } from "react";
 import { MessageInput } from "./message-input";
 import { ClassificationResult } from "./classification-result";
 import { Shield, Activity, Database, Cpu } from "lucide-react";
+import axios from 'axios';
+import { API_BASE_URL } from "@/config";
 
 interface ClassificationResultType {
-  classification: "spam" | "ham";
+  accuracy: number;
   confidence: number;
-  indicators: string[];
+  label: "ham" | "spam";
+  probabilities: {
+    ham: number;
+    spam: number;
+  };
+  raw_prediction: "ham" | "spam";
+  text_length: number;
 }
 
-// Simulated AI classification function
-function classifyMessage(message: string): Promise<ClassificationResultType> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const lowerMessage = message.toLowerCase();
+async function classifyMessageAPI(
+  message: string
+): Promise<ClassificationResultType> {
+  const response = await axios.post<ClassificationResultType>(
+    `${API_BASE_URL}/predict`,
+    { text: message }
+  );
 
-      // Spam indicators
-      const spamIndicators = [
-        {
-          pattern: /urgent|immediately|act now|limited time/i,
-          indicator: "Urgency language detected",
-        },
-        {
-          pattern: /\$[\d,]+|won|winner|prize|reward|cash/i,
-          indicator: "Financial incentive mentioned",
-        },
-        {
-          pattern: /click here|bit\.ly|tinyurl|short link/i,
-          indicator: "Suspicious link pattern",
-        },
-        {
-          pattern: /claim|redeem|collect your/i,
-          indicator: "Action-oriented phishing",
-        },
-        {
-          pattern: /free|100%|guarantee/i,
-          indicator: "Too good to be true offers",
-        },
-        {
-          pattern: /verify|confirm|update your (account|info)/i,
-          indicator: "Data harvesting attempt",
-        },
-        {
-          pattern: /bank|paypal|amazon|apple/i,
-          indicator: "Brand impersonation risk",
-        },
-        { pattern: /!/g, indicator: "Excessive punctuation" },
-      ];
-
-      // Ham indicators
-      const hamIndicators = [
-        {
-          pattern: /meeting|schedule|appointment/i,
-          indicator: "Calendar/scheduling context",
-        },
-        {
-          pattern: /thank|thanks|appreciate/i,
-          indicator: "Polite communication",
-        },
-        { pattern: /how are you|hope you're/i, indicator: "Personal greeting" },
-        {
-          pattern: /let me know|get back to/i,
-          indicator: "Normal conversation flow",
-        },
-        { pattern: /see you|talk soon|later/i, indicator: "Casual sign-off" },
-      ];
-
-      let spamScore = 0;
-      let hamScore = 0;
-      const detectedSpamIndicators: string[] = [];
-      const detectedHamIndicators: string[] = [];
-
-      spamIndicators.forEach(({ pattern, indicator }) => {
-        if (pattern.test(lowerMessage)) {
-          spamScore += 20;
-          if (!detectedSpamIndicators.includes(indicator)) {
-            detectedSpamIndicators.push(indicator);
-          }
-        }
-      });
-
-      hamIndicators.forEach(({ pattern, indicator }) => {
-        if (pattern.test(lowerMessage)) {
-          hamScore += 25;
-          if (!detectedHamIndicators.includes(indicator)) {
-            detectedHamIndicators.push(indicator);
-          }
-        }
-      });
-
-      // Additional heuristics
-      const exclamationCount = (message.match(/!/g) || []).length;
-      if (exclamationCount > 3) spamScore += 15;
-
-      const upperCaseRatio =
-        (message.match(/[A-Z]/g) || []).length / message.length;
-      if (upperCaseRatio > 0.5 && message.length > 10) {
-        spamScore += 20;
-        if (!detectedSpamIndicators.includes("Excessive capitalization")) {
-          detectedSpamIndicators.push("Excessive capitalization");
-        }
-      }
-
-      const isSpam = spamScore > hamScore;
-      const totalScore = spamScore + hamScore;
-      const rawConfidence = isSpam
-        ? (spamScore / Math.max(totalScore, 1)) * 100
-        : (hamScore / Math.max(totalScore, 1)) * 100;
-
-      // Ensure confidence is between 65-99%
-      const confidence = Math.min(
-        99,
-        Math.max(65, rawConfidence + Math.random() * 15)
-      );
-
-      resolve({
-        classification: isSpam ? "spam" : "ham",
-        confidence: Number(confidence.toFixed(1)),
-        indicators: isSpam
-          ? detectedSpamIndicators.slice(0, 4)
-          : detectedHamIndicators.slice(0, 4),
-      });
-    }, 2000); // Simulate processing time
-  });
+  return response.data;
 }
 
 export function SMSClassifier() {
@@ -141,14 +44,21 @@ export function SMSClassifier() {
   ];
   const handleScan = async () => {
     if (!message.trim()) return;
-
-    setIsAnalyzing(true);
-    setResult(null);
-
-    const classificationResult = await classifyMessage(message);
-    setResult(classificationResult);
-    setIsAnalyzing(false);
+  
+    try {
+      setIsAnalyzing(true);
+      setResult(null);
+  
+      const classificationResult = await classifyMessageAPI(message);
+      console.log("Réponse du backend : ", classificationResult);
+      setResult(classificationResult);
+    } catch (error) {
+      console.error("Erreur lors de la classification :", error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
+  
 
   const handleClear = () => {
     setMessage("");
@@ -273,7 +183,7 @@ export function SMSClassifier() {
                 className="absolute -inset-1 rounded-2xl opacity-50 transition-all duration-500"
                 style={{
                   background: result
-                    ? result.classification === "spam"
+                    ? result.label === "spam"
                       ? "linear-gradient(135deg, rgba(255, 71, 87, 0.15), transparent)"
                       : "linear-gradient(135deg, rgba(0, 230, 118, 0.15), transparent)"
                     : "linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent)",
