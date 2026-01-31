@@ -5,10 +5,15 @@ import { ConfidenceGauge } from "./confidence-gauge"
 
 interface ClassificationResultProps {
   result: {
-    classification: "spam" | "ham"
-    confidence: number
-    threats?: string[]
-    indicators?: string[]
+    accuracy: number;
+    confidence: number;
+    label: "ham" | "spam"
+    probabilities: {
+      ham : number;
+      spam : number;
+    };
+    raw_prediction : "ham" | "spam";
+    text_length : number;
   } | null
   isAnalyzing: boolean
 }
@@ -55,7 +60,7 @@ export function ClassificationResult({ result, isAnalyzing }: ClassificationResu
     )
   }
 
-  const isSpam = result.classification === "spam"
+  const isSpam = result.label === "spam"
 
   return (
     <div className="flex flex-col items-center py-6">
@@ -89,8 +94,8 @@ export function ClassificationResult({ result, isAnalyzing }: ClassificationResu
 
       {/* Confidence Gauge */}
       <ConfidenceGauge 
-        value={result.confidence} 
-        status={result.classification}
+        value={result.confidence * 100} 
+        status={result.label}
       />
 
       {/* Classification Icon */}
@@ -115,8 +120,7 @@ export function ClassificationResult({ result, isAnalyzing }: ClassificationResu
         )}
       </div>
 
-      {/* Indicators */}
-      {result.indicators && result.indicators.length > 0 && (
+       {/* {result.indicators && result.indicators.length > 0 && (
         <div className="mt-8 w-full max-w-sm">
           <h4 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
             {isSpam ? "Risk Indicators" : "Trust Indicators"}
@@ -142,7 +146,7 @@ export function ClassificationResult({ result, isAnalyzing }: ClassificationResu
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
