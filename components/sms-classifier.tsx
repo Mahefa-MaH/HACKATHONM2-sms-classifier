@@ -5,6 +5,7 @@ import { MessageInput } from "./message-input";
 import { ClassificationResult } from "./classification-result";
 import { Shield, Activity, Database, Cpu } from "lucide-react";
 import axios from 'axios';
+import { API_BASE_URL } from "@/config";
 
 interface ClassificationResultType {
   accuracy: number;
@@ -22,7 +23,7 @@ async function classifyMessageAPI(
   message: string
 ): Promise<ClassificationResultType> {
   const response = await axios.post<ClassificationResultType>(
-    "http://127.0.0.1:8000/api/nlp/predict",
+    `${API_BASE_URL}/predict`,
     { text: message }
   );
 
